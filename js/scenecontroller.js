@@ -65,11 +65,11 @@ SceneController.prototype.setupGUI = function()
     this.gui.add(this.params, 'model', [ 'quad', 'box', 'sphere', 'torus'] ).name('3D Model').onChange(function(newValue){this.object.screenController.changeModel()});
     this.gui.add(this.params, 'texStyle', [ 'Nearest', 'Linear', 'MipMap Nearest', 'MipMap Linear'] ).name('Texture Style').onChange(function(newValue){this.object.screenController.changeTextureStyle()});
 
-    this.enableSMap = this.gui.add( this.params, "sMapping" ).name("Spherical mapping").onChange(function(newValue){this.object.screenController.sphericalMap()});
+    this.gui.add( this.params, "sMapping" ).name("Spherical mapping").onChange(function(newValue){this.object.screenController.sphericalMap(newValue)});
     this.gui.add( this.params, "envMapping" ).name("Environment mapping").onChange(function(newValue){this.object.screenController.envMap()});
     this.gui.add( this.params, "drawSilhouette" ).name("Draw silhouette").onChange(function(newValue){this.object.screenController.silhouetteShaders()});
     this.gui.add( this.params, "bumpMap" ).name("Bump map").onChange(function(newValue){this.object.screenController.bumpMap()});
-    this.gui.add(this.params, "fixSMapping").name("Fixed spherical mapping").onChange(function(newValue){this.object.screenController.fixSphericalMap()});
+    this.gui.add( this.params, "fixSMapping").name("Fixed spherical mapping").onChange(function(newValue){this.object.screenController.fixSphericalMap(newValue)});
     this.gui.add( this.params, "pen" ).name("Pen drawing").onChange(function(newValue){this.object.screenController.penDrawing()});
 
     this.gui.open()
@@ -168,22 +168,22 @@ SceneController.prototype.setupControls = function()
     this.controls.maxDistance = 10;
 };
 
-SceneController.prototype.sphericalMap = function()
+SceneController.prototype.sphericalMap = function(value)
 {
     const self = this;
-    this.enableSMap.onChange(function(value){
-        if (value === true) {
-            self.scene.children[3].material.vertexShader = document.getElementById('sphereTextureMapVertexShader').textContent;
-            self.scene.children[3].material.fragmentShader = document.getElementById('sphereTextureMapFragmentShader').textContent;
-            self.scene.children[3].material.needsUpdate = true;
-            self.render();
-        } else if (value === false) {
-            self.scene.children[3].material.vertexShader = document.getElementById('vertexShader').textContent;
-            self.scene.children[3].material.fragmentShader = document.getElementById('fragmentShader').textContent;
-            self.scene.children[3].material.needsUpdate = true;
-            self.render();
-        }
-    });
+    self.params.sMapping = value;
+    if (self.params.sMapping === true) {
+        self.scene.children[3].material.vertexShader = document.getElementById('sphereTextureMapVertexShader').textContent;
+        self.scene.children[3].material.fragmentShader = document.getElementById('sphereTextureMapFragmentShader').textContent;
+        self.scene.children[3].material.needsUpdate = true;
+        self.render();
+    } else {
+        self.scene.children[3].material.vertexShader = document.getElementById('vertexShader').textContent;
+        self.scene.children[3].material.fragmentShader = document.getElementById('fragmentShader').textContent;
+        self.scene.children[3].material.needsUpdate = true;
+        self.render();
+    }
+
     this.render();
 };
 
@@ -201,8 +201,20 @@ SceneController.prototype.bumpMap = function(){
 
 };
 
-SceneController.prototype.fixSphericalMap = function ()
+SceneController.prototype.fixSphericalMap = function (value)
 {
+    const self = this;
+    self.params.fixSMapping = value;
+    if(self.params.fixSMapping === true) {
+        self.scene.children[3].material.vertexShader = document.getElementById('fixSphereTextureMapVertexShader').textContent;
+        self.scene.children[3].material.fragmentShader = document.getElementById('fixSphereTextureMapFragmentShader').textContent;
+        self.scene.children[3].material.needsUpdate = true;
+    } else {
+        self.scene.children[3].material.vertexShader = document.getElementById('vertexShader').textContent;
+        self.scene.children[3].material.fragmentShader = document.getElementById('fragmentShader').textContent;
+        self.scene.children[3].material.needsUpdate = true;
+        self.render();
+    }
     this.render();
 };
 

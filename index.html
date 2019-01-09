@@ -39,32 +39,62 @@
     }
 </script>
 
-
 <script id="sphereTextureMapVertexShader" type="x-shader/x-vertex">
     varying vec3 texCoords;
 
+    varying vec2 uvPassed;
+
     void main() {
         gl_Position =   projectionMatrix * modelViewMatrix * vec4(position,1.0);
-        texCoords = position;
+
+        float pi = 3.1415926535897932384626433832795;
+        vec3 unitSphereVectors = normalize(position);
+        float coordU = 1.0 - (pi+atan(unitSphereVectors.z,-unitSphereVectors.x)) / (2.0 * pi);
+        float pow1 = float(pow(unitSphereVectors.x, 2.0));
+        float pow2 = float(pow(unitSphereVectors.z, 2.0));
+        float coordV = 1.0 - atan(sqrt(pow1+pow2),unitSphereVectors.y) / pi;
+        uvPassed = vec2(coordU, coordV);
     }
 </script>
 
 <script id="sphereTextureMapFragmentShader" type="x-shader/x-fragment">
     uniform sampler2D texture1;
 
-    varying vec3 texCoords;
+    varying vec2 uvPassed;
 
     void main() {
-        float pi = 3.1415926535897932384626433832795;
-        vec3 unitSphereVectors = normalize(texCoords);
-        float coordU = 1.0 - (pi+atan(unitSphereVectors.z,-unitSphereVectors.x)) / (2.0 * pi);
-        float pow1 = float(pow(unitSphereVectors.x, 2.0));
-        float pow2 = float(pow(unitSphereVectors.z, 2.0));
-        float coordV = 1.0 - atan(sqrt(pow1+pow2),unitSphereVectors.y) / pi;
-        vec2 vUv = vec2(coordU, coordV);
+
+        vec2 vUv = uvPassed;
 
         gl_FragColor = texture2D(texture1, vUv);
     }
+</script>
+
+<script id="fixSphereTextureMapVertexShader" type="x-shader/x-vertex">
+varying vec3 texCoords;
+
+void main() {
+gl_Position =   projectionMatrix * modelViewMatrix * vec4(position,1.0);
+texCoords = position;
+}
+</script>
+
+<script id="fixSphereTextureMapFragmentShader" type="x-shader/x-fragment">
+uniform sampler2D texture1;
+
+varying vec3 texCoords;
+
+void main() {
+float pi = 3.1415926535897932384626433832795;
+vec3 unitSphereVectors = normalize(texCoords);
+float coordU = 1.0 - (pi+atan(unitSphereVectors.z,-unitSphereVectors.x)) / (2.0 * pi);
+float pow1 = float(pow(unitSphereVectors.x, 2.0));
+float pow2 = float(pow(unitSphereVectors.z, 2.0));
+float coordV = 1.0 - atan(sqrt(pow1+pow2),unitSphereVectors.y) / pi;
+vec2 vUv = vec2(coordU, coordV);
+
+gl_FragColor = texture2D(texture1, vUv);
+}
 </script>
 
 
