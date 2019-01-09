@@ -57,11 +57,13 @@
     void main() {
         float pi = 3.1415926535897932384626433832795;
         vec3 unitSphereVectors = normalize(texCoords);
-        vec2 uUv = vec2(atan(unitSphereVectors.z, unitSphereVectors.x), asin(unitSphereVectors.y));
-        uUv *= 1.0 / (2.0 * pi);
-        uUv += 0.5;
+        float coordU = 1.0 - (pi+atan(unitSphereVectors.z,-unitSphereVectors.x)) / (2.0 * pi);
+        float pow1 = float(pow(unitSphereVectors.x, 2.0));
+        float pow2 = float(pow(unitSphereVectors.z, 2.0));
+        float coordV = 1.0 - atan(sqrt(pow1+pow2),unitSphereVectors.y) / pi;
+        vec2 vUv = vec2(coordU, coordV);
 
-        gl_FragColor = texture2D(texture1, uUv);
+        gl_FragColor = texture2D(texture1, vUv);
     }
 </script>
 
