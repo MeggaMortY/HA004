@@ -65,7 +65,7 @@ SceneController.prototype.setupGUI = function()
     this.gui.add(this.params, 'model', [ 'quad', 'box', 'sphere', 'torus'] ).name('3D Model').onChange(function(newValue){this.object.screenController.changeModel()});
     this.gui.add(this.params, 'texStyle', [ 'Nearest', 'Linear', 'MipMap Nearest', 'MipMap Linear'] ).name('Texture Style').onChange(function(newValue){this.object.screenController.changeTextureStyle()});
 
-    this.gui.add( this.params, "sMapping" ).name("Spherical mapping").onChange(function(newValue){this.object.screenController.sphericalMap()});
+    this.enableSMap = this.gui.add( this.params, "sMapping" ).name("Spherical mapping").onChange(function(newValue){this.object.screenController.sphericalMap()});
     this.gui.add( this.params, "envMapping" ).name("Environment mapping").onChange(function(newValue){this.object.screenController.envMap()});
     this.gui.add( this.params, "drawSilhouette" ).name("Draw silhouette").onChange(function(newValue){this.object.screenController.silhouetteShaders()});
     this.gui.add( this.params, "bumpMap" ).name("Bump map").onChange(function(newValue){this.object.screenController.bumpMap()});
@@ -170,7 +170,20 @@ SceneController.prototype.setupControls = function()
 
 SceneController.prototype.sphericalMap = function()
 {
-
+    const self = this;
+    this.enableSMap.onChange(function(value){
+        if (value === true) {
+            self.scene.children[3].material.vertexShader = document.getElementById('sphereTextureMapVertexShader').textContent;
+            self.scene.children[3].material.fragmentShader = document.getElementById('sphereTextureMapFragmentShader').textContent;
+            self.scene.children[3].material.needsUpdate = true;
+            self.render();
+        } else if (value === false) {
+            self.scene.children[3].material.vertexShader = document.getElementById('vertexShader').textContent;
+            self.scene.children[3].material.fragmentShader = document.getElementById('fragmentShader').textContent;
+            self.scene.children[3].material.needsUpdate = true;
+            self.render();
+        }
+    });
     this.render();
 };
 
@@ -289,8 +302,8 @@ SceneController.prototype.setupGeometry = function()
 
     this.material = new THREE.ShaderMaterial( {
         uniforms : this.uniforms,
-        vertexShader: document.getElementById('sphereTextureMapVertexShader').textContent,
-        fragmentShader: document.getElementById('sphereTextureMapFragmentShader').textContent
+        vertexShader: document.getElementById('vertexShader').textContent,
+        fragmentShader: document.getElementById('fragmentShader').textContent
     });
 
     var geometry = new THREE.PlaneBufferGeometry( 0.5, 0.5 );
