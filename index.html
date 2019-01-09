@@ -1,0 +1,74 @@
+<html>
+<head>
+
+    <title>CG1 Exercise 04 - Texturing</title>
+
+    <!-- import main JavaScript module using RequireJS -->
+    <script src="js/libs/three.min.js"></script>
+    <script src="js/libs/stats.min.js"></script>
+    <script src="js/libs/dat.gui.min.js"></script>
+    <script src="js/controls/TrackballControls.js"></script>
+    <script src="js/controls/OrbitControls.js"></script>
+
+    <script src="js/scenecontroller.js"></script>
+    <script src="js/htmlcontroller.js"></script>
+    <script src="js/main.js"></script>
+
+    <!-- import style sheet -->
+    <link rel="stylesheet" type="text/css" media="screen" href="style.css">
+
+</head>
+
+<script id="vertexShader" type="x-shader/x-vertex">
+    varying vec2 vUv;
+
+    void main() {
+        vUv = uv;
+
+        gl_Position =   projectionMatrix * modelViewMatrix * vec4(position,1.0);
+    }
+</script>
+
+<script id="fragmentShader" type="x-shader/x-fragment">
+    uniform sampler2D texture1;
+
+    varying vec2 vUv;
+
+    void main() {
+        gl_FragColor = texture2D(texture1, vUv);
+    }
+</script>
+
+
+<script id="sphereTextureMapVertexShader" type="x-shader/x-vertex">
+    varying vec3 texCoords;
+
+    void main() {
+        gl_Position =   projectionMatrix * modelViewMatrix * vec4(position,1.0);
+        texCoords = position;
+    }
+</script>
+
+<script id="sphereTextureMapFragmentShader" type="x-shader/x-fragment">
+    uniform sampler2D texture1;
+
+    varying vec3 texCoords;
+
+    void main() {
+        float pi = 3.1415926535897932384626433832795;
+        vec3 unitSphereVectors = normalize(texCoords);
+        vec2 uUv = vec2(atan(unitSphereVectors.z, unitSphereVectors.x), asin(unitSphereVectors.y));
+        uUv *= 1.0 / (2.0 * pi);
+        uUv += 0.5;
+
+        gl_FragColor = texture2D(texture1, uUv);
+    }
+</script>
+
+
+<body onLoad="main()">
+    <!-- this element will be used to diplay errors -->
+    <pre id="error"></pre>
+
+</body>
+</html>
